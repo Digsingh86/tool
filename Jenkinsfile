@@ -1,57 +1,21 @@
 pipeline {
     agent any
-
-    environment {
-        AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
-        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
-        AWS_DEFAULT_REGION    = "ap-southeast-1"
-        
-    }
-
-    parameters {
-        choice(
-            name: 'Action',
-            choices: ['Build', 'Destroy'],
-            description: 'The action to take'
-        )
-        choice(
-            name: 'Colour',
-            choices: ['Blue', 'Green'],
-            description: 'The environment to use'
-        )
-    }
-
+ 
     stages {
-        stage('Init') {
+        stage('checkout') {
             steps {
-                terraformInit()
+                checkout([$class: 'GitSCM', branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/Digsingh86/tool.git']]])
             }
         }
-        stage('Plan') {
+        stage('init') {
             steps {
-                terraformPlan()
+                sh ('terraform init') 
             }
         }
-        stage('Approval') {
+        stage('terraform  action') {
             steps {
-                input(message: 'Apply Terraform ?')
-            }
-        }
-        stage('Apply') {
-            steps {
-                terraformApply()
-            }
-        }
-        stage('Validate') {
-            steps {
-                inspecValidation()
+                echo "Terraform action is --> ${action}"
+                sh ('terraform ${action} --auto-approve')
             }
         }
     }
-    post {
-        always {
-            echo 'Deleting Directory!'
-            deleteDir()
-        }
-    }
-}
