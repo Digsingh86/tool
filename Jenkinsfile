@@ -1,36 +1,57 @@
 pipeline {
     agent any
-    tools {
-       terraform 'terraform'
-    }
-    stages {
-        stage('Git checkout') {
-           steps{
-                git branch: 'main', credentialsId: 'Github', url: 'https://github.com/Digsingh86/tool.git'
-            }
-        }
-        environment {
+
+    environment {
         AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
         AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
         AWS_DEFAULT_REGION    = "ap-southeast-1"
         
     }
-        stage('terraform format check') {
-            steps{
-                sh 'terraform fmt'
+
+    parameters {
+        choice(
+            name: 'Action',
+            choices: ['Build', 'Destroy'],
+            description: 'The action to take'
+        )
+        choice(
+            name: 'Colour',
+            choices: ['Blue', 'Green'],
+            description: 'The environment to use'
+        )
+    }
+
+    stages {
+        stage('Init') {
+            steps {
+                terraformInit()
             }
         }
-        stage('terraform Init') {
-            steps{
-                sh 'terraform init'
+        stage('Plan') {
+            steps {
+                terraformPlan()
             }
         }
-        stage('terraform apply') {
-            steps{
-                sh 'terraform apply --auto-approve'
+        stage('Approval') {
+            steps {
+                input(message: 'Apply Terraform ?')
+            }
+        }
+        stage('Apply') {
+            steps {
+                terraformApply()
+            }
+        }
+        stage('Validate') {
+            steps {
+                inspecValidation()
             }
         }
     }
-
-    
+    post {
+        always {
+            echo 'Deleting Directory!'
+            deleteDir()
+        }
+    }
 }
