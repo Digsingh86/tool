@@ -2,10 +2,10 @@ pipeline {
     agent any
 
     parameters {
-        string(name: 'environment', defaultValue: 'terraform', description: 'Workspace/environment file to use for deployment')
-        booleanParam(name: 'autoApprove', defaultValue: false, description: 'Automatically run apply after generating plan?')
-        booleanParam(name: 'destroy', defaultValue: false, description: 'Destroy Terraform build?')
-
+        choice choices: ['apply', 'destroy'], description: 'Select any one option', name: 'terraform_Infra'
+        }
+        options {
+           buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '10', numToKeepStr: '5')
     }
 
 
