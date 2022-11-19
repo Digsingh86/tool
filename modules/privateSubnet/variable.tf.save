@@ -1,0 +1,21 @@
+variable "PVT_SUBNET_CIDR_BLOCK" {
+  type        = string
+  description = "CIDR block for public subnet"
+  default     = ""
+}
+variable "PUB_SUBNET_TAGS" {
+  default     = {}
+  description = "tags for RabbitMQ public subnet"
+  type        = map(string)
+}
+variable "PUB_SUBNET_AZ" {
+  default     = {}
+}
+variable "public_routeTable_id" {
+  default     = {}
+}
+variable "vpc_id" {
+  default     = ""
+  type        = string
+  description = "VPC ID for mongo vpc"
+}

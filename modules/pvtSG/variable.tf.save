@@ -1,0 +1,20 @@
+variable "PVT_SG_NAME" {
+  type        = string
+  description = "private security group"
+  default     = "mongo-engine-public-sg"
+}
+variable "HTTPS_PORT" {
+  type        = string
+  description = "TCP port for https"
+  default     = "443"
+}
+variable "IDR_BLOCK" {
+  default     = ""
+  type        = string
+  description = "VPC ID for mongo vpc"
+}
+variable "PVT_SG_TAGS" {
+  default     = {}
+  description = "Public Security group tags for mongo"
+  type        = map(string)
+}

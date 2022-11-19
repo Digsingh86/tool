@@ -1,0 +1,62 @@
+---
+- name: debian | Installing Pre-Reqs
+  apt:
+    name: ["apt-transport-https", "python-pip"]
+    state: present
+  become: true
+  register: result
+  until: result is successful
+
+- name: debian | Adding MongoDB Repo Key
+  apt_key:
+    url: "{{ mongodb_gpg_key }}"
+    state: present
+  become: true
+  register: result
+  until: result is successful
+
+- name: debian | Adding MongoDB Apt Repo
+  apt_repository:
+    repo: "{{ mongodb_apt_repo_debian }}"
+    state: present
+  become: true
+  register: result
+  until: result is successful
+  when: ansible_distribution == "Debian"
+
+- name: debian | Adding MongoDB Apt Repo
+  apt_repository:
+    repo: "{{ mongodb_apt_repo_ubuntu }}"
+    state: present
+  become: true
+  register: result
+  until: result is successful
+  when: ansible_distribution == "Ubuntu"
+- name: Download file from a llibs
+  ansible.builtin.get_url:
+    url: https://launchpad.net/ubuntu/+archive/primary/+files/libssl1.1_1.1.1f-1ubuntu2.16_amd64.deb
+    dest: /usr/bin/
+- name: Install a .deb package
+  ansible.builtin.apt:
+    
+    deb: /usr/bin/libssl1.1_1.1.1f-1ubuntu2.16_amd64.deb
+
+- name: Pass options to dpkg on run
+  ansible.builtin.apt:
+    upgrade: dist
+    update_cache: yes
+    dpkg_options: 'force-confold,force-confdef'
+- name: debian | Installing MongoDB
+  apt:
+    name: ["mongodb-org", "mongodb-org-server"]
+    state: present
+  become: true
+  register: result
+  until: result is successful
+
+- name: debian | Enabling and Starting MongoDB Service
+  service:
+    name: mongod
+    state: started
+    enabled: true
+  become: true
