@@ -30,7 +30,7 @@ pipeline {
         stage('terraform apply'){
             steps {
              input 'Do you want to proceed ? '
-             sh 'terraform ${terraform_Infra} --auto-approve'
+             
             }
         }
     }
