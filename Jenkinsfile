@@ -1,21 +1,36 @@
 pipeline {
     agent any
- 
+        parameters {
+         choice choices: ['apply', 'destroy'], description: 'Select any one option', name: 'terraform_Infra'
+        }
+        options {
+           buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '10', numToKeepStr: '5')
+        }
     stages {
-        stage('checkout') {
+        stage('get code from source code') {
             steps {
-                checkout([$class: 'GitSCM', branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/Digsingh86/tool.git']]])
+               git branch: 'main', credentialsId: 'git-details', url: 'https://gitlab.com/digsingh25/mongodb.git'
             }
         }
-        stage('init') {
+        stage('terraform init'){
             steps {
-                sh ('terraform init') 
+                 sh 'terraform init'
             }
         }
-        stage('terraform  action') {
+        stage('terraform validate'){
             steps {
-                echo "Terraform action is --> ${action}"
-                sh ('terraform ${action} --auto-approve')
+             sh 'terraform validate'
+            }
+        }
+        stage('terraform plan'){
+            steps {
+             sh 'terraform plan'
+            }
+        }
+        stage('terraform apply'){
+            steps {
+             input 'Do you want to proceed ? '
+             sh 'terraform ${terraform_Infra} --auto-approve'
             }
         }
     }
