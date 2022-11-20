@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('get code from source code') {
             steps {
-               git branch: 'main', credentialsId: 'git-details', url: 'https://gitlab.com/digsingh25/mongodb.git'
+               git branch: 'main', credentialsId: 'git-details', url: 'https://gitlab.com/Rakeshkchauhan/mytool.git'
             }
         }
         stage('terraform init'){
